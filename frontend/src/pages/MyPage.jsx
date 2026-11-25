@@ -47,10 +47,12 @@ export default function MyPage() {
         <label className="field-label" htmlFor="phone">연락처</label>
         <form className="inline-form" onSubmit={(e) => { e.preventDefault(); lookup() }}>
           <input id="phone" className={error ? 'input invalid' : 'input'} value={phone} inputMode="tel"
-            placeholder="010-1234-5678" onChange={(e) => setPhone(e.target.value)} />
+            placeholder="010-1234-5678" onChange={(e) => { setPhone(e.target.value); setError('') }} />
           <button className="btn primary">조회</button>
         </form>
-        {error && <p className="field-error">{error}</p>}
+        {error
+          ? <p className="field-error">{error}</p>
+          : <p className="field-hint">하이픈(-) 없이 숫자만 입력해도 됩니다</p>}
 
         {list && (
           <>

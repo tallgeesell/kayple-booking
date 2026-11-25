@@ -9,6 +9,7 @@ import java.time.YearMonth;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 	public static final String SLOT_TAKEN_MESSAGE = "이미 예약된 시간입니다. 다른 시간을 선택해 주세요.";
 	public static final String ALREADY_HAS_MESSAGE = "이미 신청한 예약이 있습니다";
+	/** 이름: 한글 완성형·영문·공백만 허용 (숫자·특수문자 불가) */
+	private static final Pattern NAME = Pattern.compile("^[가-힣a-zA-Z ]+$");
 	private static final Set<ReservationStatus> ACTIVE = EnumSet.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
 
 	private final ReservationRepository repository;
@@ -54,6 +57,8 @@ public class ReservationService {
 	public ReservationView create(CreateRequest req) {
 		String name = req.name().trim();
 		if (name.isEmpty()) throw ApiException.badRequest("INVALID_NAME", "이름을 입력해 주세요");
+		if (!NAME.matcher(name).matches())
+			throw ApiException.badRequest("INVALID_NAME", "이름은 한글 또는 영문으로만 입력해 주세요");
 		String phone = PhoneNumbers.normalize(req.phone());
 		if (phone == null) throw ApiException.badRequest("INVALID_PHONE", "연락처 형식이 올바르지 않습니다");
 

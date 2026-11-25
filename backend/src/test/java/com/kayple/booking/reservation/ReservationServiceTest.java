@@ -149,6 +149,26 @@ class ReservationServiceTest {
 	void 연락처_형식이_틀리면_거절한다() {
 		assertApiError(() -> service.create(req(TOMORROW, 10, "010-1234")), HttpStatus.BAD_REQUEST, "INVALID_PHONE");
 		assertApiError(() -> service.create(req(TOMORROW, 10, "02-123-4567")), HttpStatus.BAD_REQUEST, "INVALID_PHONE");
+		assertApiError(() -> service.create(req(TOMORROW, 10, "010-123-4567")), HttpStatus.BAD_REQUEST, "INVALID_PHONE"); // 010은 11자리만
+	}
+
+	@Test
+	void 연락처_규칙_010은_11자리_예전번호는_10자리도_허용() {
+		assertThat(PhoneNumbers.normalize("01012345678")).isEqualTo("010-1234-5678");
+		assertThat(PhoneNumbers.normalize("010 1234 5678")).isEqualTo("010-1234-5678");
+		assertThat(PhoneNumbers.normalize("0101234567")).isNull();
+		assertThat(PhoneNumbers.normalize("011-123-4567")).isEqualTo("011-123-4567");
+		assertThat(PhoneNumbers.normalize("017-1234-5678")).isEqualTo("017-1234-5678");
+		assertThat(PhoneNumbers.normalize("016-12-34567")).isEqualTo("016-123-4567");
+		assertThat(PhoneNumbers.normalize("012-123-4567")).isNull();
+	}
+
+	@Test
+	void 이름에_숫자나_특수문자가_있으면_거절한다() {
+		assertApiError(() -> service.create(new CreateRequest(TOMORROW, 10, "홍길동1", "010-1234-5678", TODAY)), HttpStatus.BAD_REQUEST, "INVALID_NAME");
+		assertApiError(() -> service.create(new CreateRequest(TOMORROW, 10, "홍길동!", "010-1234-5678", TODAY)), HttpStatus.BAD_REQUEST, "INVALID_NAME");
+		assertApiError(() -> service.create(new CreateRequest(TOMORROW, 10, "ㅋㅋ", "010-1234-5678", TODAY)), HttpStatus.BAD_REQUEST, "INVALID_NAME");
+		assertThat(service.create(new CreateRequest(TOMORROW, 10, "John Kim", "010-1234-5678", TODAY)).name()).isEqualTo("John Kim");
 	}
 
 	@Test

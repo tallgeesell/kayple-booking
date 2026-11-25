@@ -10,8 +10,11 @@ export const longDate = (s) => { const d = parseDate(s); return `${d.getMonth() 
 export const hourText = (h) => `${String(h).padStart(2, '0')}:00`
 export const slotText = (date, hour) => `${longDate(date)} ${hourText(hour)}`
 
-export const PHONE_RE = /^01[016789]-?\d{3,4}-?\d{4}$/
-export const isValidPhone = (p) => PHONE_RE.test(p.replace(/\s/g, ''))
+// 서버(PhoneNumbers)와 같은 규칙: 하이픈·공백 제거 후 010은 11자리, 011·016~019는 10~11자리
+export const PHONE_RE = /^(010\d{8}|01[16789]\d{7,8})$/
+export const isValidPhone = (p) => PHONE_RE.test(p.replace(/[\s-]/g, ''))
+// 서버와 같은 규칙: 한글 완성형·영문·공백만
+export const NAME_RE = /^[가-힣a-zA-Z ]+$/
 
 export const STATUS_LABEL = { PENDING: '대기', CONFIRMED: '승인', CANCELLED: '취소됨' }
 

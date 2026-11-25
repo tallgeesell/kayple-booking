@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../Header.jsx'
 import Modal from '../Modal.jsx'
 import { api } from '../api.js'
-import { dayName, shortDate, hourText, slotText, isValidPhone, toIso } from '../format.js'
+import { dayName, shortDate, hourText, slotText, isValidPhone, toIso, NAME_RE } from '../format.js'
 
 export default function BookPage() {
   const navigate = useNavigate()
@@ -47,6 +47,7 @@ export default function BookPage() {
   function validate() {
     const e = {}
     if (!name.trim()) e.name = '이름을 입력해 주세요'
+    else if (!NAME_RE.test(name.trim())) e.name = '이름은 한글 또는 영문으로만 입력해 주세요'
     else if (name.trim().length > 20) e.name = '이름은 20자 이내로 입력해 주세요'
     if (!phone.trim()) e.phone = '연락처를 입력해 주세요'
     else if (!isValidPhone(phone)) e.phone = '연락처 형식이 올바르지 않습니다'
@@ -119,13 +120,15 @@ export default function BookPage() {
           <form onSubmit={submit} noValidate>
             <label className="field-label" htmlFor="name">이름</label>
             <input id="name" className={errors.name ? 'input invalid' : 'input'} value={name} maxLength={20}
-              placeholder="홍길동" onChange={(e) => setName(e.target.value)} />
+              placeholder="홍길동" onChange={(e) => { setName(e.target.value); setErrors((x) => ({ ...x, name: undefined })) }} />
             {errors.name && <p className="field-error">{errors.name}</p>}
 
             <label className="field-label" htmlFor="phone">연락처</label>
             <input id="phone" className={errors.phone ? 'input invalid' : 'input'} value={phone} inputMode="tel"
-              placeholder="010-1234-5678" onChange={(e) => setPhone(e.target.value)} />
-            {errors.phone && <p className="field-error">{errors.phone}</p>}
+              placeholder="010-1234-5678" onChange={(e) => { setPhone(e.target.value); setErrors((x) => ({ ...x, phone: undefined })) }} />
+            {errors.phone
+              ? <p className="field-error">{errors.phone}</p>
+              : <p className="field-hint">하이픈(-) 없이 숫자만 입력해도 됩니다</p>}
 
             <button className="btn primary block" disabled={submitting}>{submitting ? '예약 중…' : '예약하기'}</button>
           </form>

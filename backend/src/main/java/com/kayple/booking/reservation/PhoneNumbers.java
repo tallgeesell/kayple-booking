@@ -2,9 +2,12 @@ package com.kayple.booking.reservation;
 
 import java.util.regex.Pattern;
 
-/** 연락처는 하이픈 유무와 관계없이 받고, 010-1234-5678 형태로 정규화해 저장·조회한다. */
+/**
+ * 연락처는 하이픈·공백 유무와 관계없이 받고, 010-1234-5678 형태로 정규화해 저장·조회한다.
+ * 010 은 11자리만, 예전 번호(011·016·017·018·019)는 가운데 3자리(10자리)도 허용한다.
+ */
 public final class PhoneNumbers {
-	private static final Pattern MOBILE = Pattern.compile("^01[016789]\\d{7,8}$");
+	private static final Pattern MOBILE = Pattern.compile("^(010\\d{8}|01[16789]\\d{7,8})$");
 
 	private PhoneNumbers() {}
 

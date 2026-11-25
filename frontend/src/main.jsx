@@ -14,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Route path="/done" element={<DonePage />} />
       <Route path="/my" element={<MyPage />} />
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/:date" element={<AdminPage />} />
       <Route path="*" element={<BookPage />} />
     </Routes>
   </BrowserRouter>,
